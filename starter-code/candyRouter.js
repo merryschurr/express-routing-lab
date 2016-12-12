@@ -1,51 +1,50 @@
 var express = require('express');
 var bodyParser = require('body-parser');
-router = express.Router();
-
-var candy = [{"id":1,"name":"Chewing Gum","color":"Red"},{"id":2,"name":"Pez","color":"Green"},{"id":3,"name":"Marshmallow","color":"Pink"},{"id":4,"name":"Candy Stick","color":"Blue"}];
+var router = express.Router();
+var candies = [{"id":1,"name":"Chewing Gum","color":"Red"},{"id":2,"name":"Pez","color":"Green"},{"id":3,"name":"Marshmallow","color":"Pink"},{"id":4,"name":"Candy Stick","color":"Blue"}];
 
 //What would need to go into candies
 //in order to pass our first test?
 
-//GET/SHOW all candies in array
-router.get('/', function(req,res) {
-	res.json(candy);
+router.route('/')
+  //GET all candies
+  .get(function(req, res, next) {
+    res.json(candies);
+  })
+  //POST a new candy
+  .post(function(req, res) {
+    candies.push(req.body);
+    res.json(req.body);
+  });
+
+// Show a candy
+router.route('/:id').get(function(req,res){
+
+var candy = candies.filter(function(element){ return element["id"] == req.params.id })[0];
+    res.json(candy);
+ 	})
+
+  .delete(function(req, res){
+    for(var i in candies){
+      if(candies[i]["id"] == req.params.id){
+        delete candies[i];
+      }
+    }
+    res.json({message : 'deleted' });
+  });
+
+//Update a candy
+router.put('/:id/edit', function(req, res) {
+  for(var i in candies){
+    if(candies[i]["id"] == req.params.id){
+      candies[i] = req.body;
+    }
+  }
+  res.format({
+    json: function(){ res.json(req.body); }
+  });
 });
 
-//GET/SHOW candy id 3 at 3000/candy/3
-router.get('/:id', function(req, res) {
-	res.send({"id":3,"name":"Marshmallow","color":"Pink"});
-});
-
-//POST/CREATE 5th candy
-router.post('/', function(req, res) {
-	res.send({"id":5,"name":"Jelly Belly","color":"Orange"});
-}); 
-
-//GET/SHOW all candies
-router.get('/', function(req,res) {
-	res.json(candy);
-});
-
-//PUT/UPDATE candy id 3 color
-router.put('/:id', function(req, res) {
-	res.send({"name":"Marshmallows","color":"white"});
-});
-
-//GET/SHOW all candies
-router.get('/', function(req,res) {
-	res.json(candy);
-});
-
-//DELETE candy id 2
-router.delete ('/:id', function(req, res) {
-	res.json({"id":2,"name":"Pez","color":"Green"});
-});
-
-//GET/SHOW all candies
-router.get('/', function(req,res) {
-	res.json(candy);
-});
 
 module.exports = router;
 
